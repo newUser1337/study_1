@@ -54,3 +54,21 @@ void fenw_add(fenw *fw, size_t ind, int value)
     fw->array[ind] += value;
     fenw_add(fw, ind | (ind + 1), value);
 }
+
+int fenw_get_sum(fenw *fw, int l_ind, int r_ind)
+{
+    int res = 0;
+    while (r_ind >= 0)
+    {
+        res += fw->array[r_ind];
+        r_ind = (r_ind & (r_ind + 1)) - 1;
+    };
+    l_ind--;
+    while (l_ind >= 0)
+    {
+        res -= fw->array[l_ind];
+        l_ind = (l_ind & (l_ind + 1)) - 1;
+    };
+
+    return res;
+}
