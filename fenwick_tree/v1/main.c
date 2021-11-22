@@ -10,12 +10,14 @@ int main()
 {
 
     int array[SIZE];
+
     for (size_t i = 0; i < SIZE; i++)
         array[i] = i + 1;
+
     fenw *fw = fenw_init(array, SIZE);
     print_arr(array, SIZE);
     fenw_print(fw);
-    int sum = fenw_get_sum_lr(fw, 3, 5);
+    int sum = fenw_get_sum_lr(fw, 1, 9);
     printf("sum : %d\n", sum);
     int elem = fenw_get_sum_element(fw, 5);
     printf("elem : %d\n", elem);

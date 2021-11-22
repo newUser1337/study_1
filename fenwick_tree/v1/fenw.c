@@ -3,41 +3,36 @@
 #include "fenw.h"
 
 int _fenw_get_sum_elem(int *, size_t, size_t);
-int get_next(int);
-int get_parent(int);
+unsigned int get_next(unsigned int);
+unsigned int get_parent(unsigned int);
 
 fenw *fenw_init(int *array, size_t size)
 {
     fenw *fw = (fenw *)malloc(sizeof(fenw));
-    fw->array = (int *)malloc(sizeof(int) * size + 1);
+    fw->array = (int *)malloc(sizeof(int) * size);
     fw->size = size;
 
     for (int i = 0; i < fw->size; i++)
-        fenw_update(fw, i, array[i]);
+        fenw_update(fw, i+1, array[i]);
 
     return fw;
 }
 
-int get_next(int in)
+unsigned int get_next(unsigned int in)
 {
-    int out;
-    out = (in | (in + 1));
-
-    return out;
+    return in + (in & -in);
 }
 
-int get_parent(int in)
+unsigned int get_parent(unsigned int in)
 {
-    int out;
-    out = (in & (in - 1));
-    return out;
+    return in - (in & -in);
 }
 
 void fenw_update(fenw *fw, int ind, int value)
 {
     while (ind < fw->size)
     {
-        fw->array[ind + 1] += value;
+        fw->array[ind] += value;
         ind = get_next(ind);
     };
 }
