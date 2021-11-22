@@ -15,8 +15,18 @@ int main()
     fenw *fw = fenw_init(array, SIZE);
     print_arr(array, SIZE);
     fenw_print(fw);
-    
+    fenw_add(fw, 1, 2);
+    fenw_print(fw);
+
+
+    printf("new\n\n");
+    array[1] += 2;
+    print_arr(array, SIZE);
+    fenw *gw = fenw_init(array, SIZE);
+    fenw_print(gw);
+
     fenw_destr(&fw);
+    fenw_destr(&gw);
 
     return 0;
 }

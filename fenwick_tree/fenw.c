@@ -42,7 +42,15 @@ int _fenw_get_sum_elem(int *array, size_t a, size_t b)
 void fenw_print(fenw *fw)
 {
     printf("Printing fenwick array \n");
-    for(size_t i = 0; i < fw->size;i++)
-        printf("%d ",fw->array[i]);
+    for (size_t i = 0; i < fw->size; i++)
+        printf("%d ", fw->array[i]);
     printf("\n");
+}
+
+void fenw_add(fenw *fw, size_t ind, int value)
+{
+    if (ind > fw->size - 1)
+        return;
+    fw->array[ind] += value;
+    fenw_add(fw, ind | (ind + 1), value);
 }

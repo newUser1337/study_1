@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ln -s /usr/lib/libbigint.so.1.0.0 /usr/lib/libbigint.so.1
+ln -s /usr/lib/libbigint.so.1 /usr/lib/libbigint.so

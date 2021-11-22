@@ -1,0 +1,5 @@
+Package: bigint
+Version: 1.0
+Architecture: amd64
+Maintainer: User
+Description: bigint arithmetics
