@@ -50,7 +50,7 @@ int _get_log(int in)
         i++;
     }
 
-    return i;
+    return i + 1;
 }
 
 void sparce_print(sparce *sp)
@@ -65,13 +65,13 @@ void sparce_print(sparce *sp)
 
 int sparce_rmq(sparce *sp, int r, int l)
 {
-    if (r > l)
+    if (r > l && sp->size > r && l >= 0)
     {
-        int t = _get_log(r - l);
+        int t = _get_log(r - l) - 1;
         if (t)
-            return _min(sp->ST[t][l], sp->ST[t][r - (1 << t)]);
+            return _min(sp->ST[t][l], sp->ST[t][r - (1 << t) + 1]);
         else
-            return _min(sp->ST[t][l], sp->ST[t][r]);
+            return _min(sp->ST[t][l], sp->ST[t][l]);
     }
     return 0;
 }
