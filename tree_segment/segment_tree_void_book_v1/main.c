@@ -63,7 +63,7 @@ int main()
 
     printf("New func\n");
 
-    if (segtree_quersearch_total(tree, range, rest))
+    if (segtree_query(tree, range, rest))
     {
         printf("result:\n");
         printf("pages: %d \n", ((book *)rest->array)->pages);

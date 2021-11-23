@@ -40,8 +40,6 @@ segtree *segtree_init(void *, size_t, size_t,
 void segtree_destr(segtree **);
 void segtree_print(segtree *);
 
-int segtree_quersearch_total(segtree *, tree_range, tree_elem *);
-int segtree_quersearch_max(segtree *, tree_range, void **);
-int segtree_quersearch_min(segtree *, tree_range, void **);
+int segtree_query(segtree *, tree_range, tree_elem *);
 
 #endif

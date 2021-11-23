@@ -87,7 +87,7 @@ void segtree_destr(segtree **sg)
     *sg = NULL;
 }
 
-int segtree_quersearch_total(segtree *sg, tree_range range, tree_elem *result)
+int segtree_query(segtree *sg, tree_range range, tree_elem *result)
 {
     int resopcode;
     if (range.low > range.high || range.low < 0 || range.high > sg->arr_size - 1)
