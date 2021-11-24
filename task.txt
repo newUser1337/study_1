@@ -18,14 +18,14 @@
 
 Структуры данных
 17. Бинарное дерево 
-18. Lowest common ancestorin binary tee
+18. Lowest common ancestorin binary tee 
 19. Бинарное дерево поиска (полное, массив)
 20. Стек
 21. Очередь
 22. Очередь с приоритетом
 23. Связаный список
 + 24. Segment tree 22.11.2021
-25. Sparse Table Algorithm
++ 25. Sparse Table Algorithm 23.11.2021
 + 26. Дерево Фенвика 22.11.2021                                         
 27. Суфиксное дерево
 28. Красно-Черное дерево
