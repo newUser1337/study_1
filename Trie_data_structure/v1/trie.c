@@ -160,7 +160,7 @@ void _trie_get_words(Trie_node *tr_node, size_t dep, List *result)
         char *word = (char *)malloc(sizeof(char) * dep);
         int z = _trie_get_word(tr_node, result, word);
         word[z] = '\n';
-        list_append(result, word);
+        list_insert(result, word);
         return;
     }
 
