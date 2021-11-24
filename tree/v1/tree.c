@@ -9,6 +9,7 @@ void _node_print_preorder(Node *, Tree *);
 void _node_print_postorder(Node *, Tree *);
 void _node_print_inorder(Node *, Tree *);
 Node *_tree_find_rec(Tree *, Node *, void *);
+int _tree_get_deep(Tree *, Node *);
 
 void _node_destr_rec(Node *);
 void _node_destr(Node **);
@@ -151,39 +152,26 @@ void _node_print_inorder(Node *node, Tree *tree)
     _node_print_inorder(node->right, tree);
 }
 
-int _tree_get_deep(Tree *, Node *);
-
-
 Node *tree_find_lowest_common_anc(Tree *tree, Node *node_1, Node *node_2)
 {
     int diff = _tree_get_deep(tree, node_1) - _tree_get_deep(tree, node_2);
 
-    if(diff < 0)
-    {
-        while(diff)
-        {
-            diff++;
+    if (diff < 0)
+        while (diff++)
             node_2 = node_2->parent;
-        }
-    }
-    else if(diff > 0)
-    {
-        while(diff)
-        {
-            diff--;
+    else if (diff > 0)
+        while (diff--)
             node_1 = node_1->parent;
-        }
-    }
-    
+
     while (node_1 != NULL)
     {
-        if(node_1 == node_2)
+        if (node_1 == node_2)
             return node_1;
         node_1 = node_1->parent;
         node_2 = node_2->parent;
     }
+
     return NULL;
-    
 }
 int _tree_get_deep(Tree *tree, Node *node)
 {
