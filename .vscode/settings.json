@@ -6,6 +6,8 @@
         "string_view": "c",
         "ranges": "c",
         "functional": "c",
-        "list.h": "c"
+        "list.h": "c",
+        "initializer_list": "c",
+        "utility": "c"
     }
 }
