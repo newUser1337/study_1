@@ -18,8 +18,8 @@ int main()
     // tree_print_inorder(Tree);
     // tree_print_postorder(Tree);
 
-    Node *f_1 = tree_find(tree, array + 7);
-    Node *f_2 = tree_find(tree, array + 8);
+    Node *f_1 = tree_find(tree, array + 8);
+    Node *f_2 = tree_find(tree, array + 6);
     Node *acn = tree_find_lowest_common_anc(tree, f_1, f_2);
     print_val(acn->data);
     return 0;

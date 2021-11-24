@@ -163,15 +163,13 @@ Node *tree_find_lowest_common_anc(Tree *tree, Node *node_1, Node *node_2)
         while (diff--)
             node_1 = node_1->parent;
 
-    while (node_1 != NULL)
+    while (node_1 != NULL && node_1 != node_2)
     {
-        if (node_1 == node_2)
-            return node_1;
         node_1 = node_1->parent;
         node_2 = node_2->parent;
     }
 
-    return NULL;
+    return node_1;
 }
 int _tree_get_deep(Tree *tree, Node *node)
 {
