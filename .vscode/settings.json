@@ -8,6 +8,12 @@
         "functional": "c",
         "list.h": "c",
         "initializer_list": "c",
-        "utility": "c"
+        "utility": "c",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "type_traits": "cpp",
+        "cmath": "cpp",
+        "limits": "cpp",
+        "new": "cpp"
     }
 }
