@@ -23,6 +23,8 @@ void _graph_tree_node_destr(TNode **);
 void _grap_init_isvisit_array(int *, int);
 void _graph_print_stack_cycle(Stack *, int);
 int _graph_stack_search(Stack *, int);
+void _graph_get_component_rec(Graph *, TNode *, int *, List *);
+void _graph_get_component_rec_ver(Graph *, LNode *, LNode *, int *);
 
 Graph *graph_init(void (*printdata)(void *),
                   int (*cmpdata)(void *, void *))
@@ -264,6 +266,64 @@ void _graph_bfs(Graph *graph, GNode *node, Queue *queue, int *isvisited)
     }
 }
 
+void graph_get_component(Graph *graph, List *result)
+{
+    int isvisited[graph->size];
+    _grap_init_isvisit_array(isvisited, graph->size);
+
+    _graph_get_component_rec(graph, graph->tree->first, isvisited, result);
+}
+
+void _graph_get_component_rec(Graph *graph, TNode *root, int *isvisited, List *result)
+{
+    if (root == NULL)
+        return;
+    if (!isvisited[((GNode *)root->data)->index - 1])
+    {
+        isvisited[((GNode *)root->data)->index - 1] = 1;
+
+        List *list_nodes = ((GNode *)root->data)->list_nodes;
+        GNode *source = _graph_create_node(((GNode*)root->data)->index, ((GNode*)root->data)->data);
+        _graph_get_list_node(graph,source);
+        LNode *cur_node = list_append(result, source);
+        list_insert(((GNode*)cur_node->data)->list_nodes, source);
+        LNode *node;
+        if (list_nodes != NULL)
+        {
+            node = list_nodes->first;
+            _graph_get_component_rec_ver(graph, cur_node, node, isvisited);
+
+            while (node != NULL)
+            {
+                if (!isvisited[((GNode *)node->data)->index - 1])
+                {
+                    isvisited[((GNode *)node->data)->index - 1] = 1;
+                    list_insert(((GNode *)cur_node->data)->list_nodes, node->data);
+                }
+                node = node->next;
+            }
+        }
+    }
+    _graph_get_component_rec(graph, root->left, isvisited, result);
+    _graph_get_component_rec(graph, root->right, isvisited, result);
+}
+
+
+
+void _graph_get_component_rec_ver(Graph *graph, LNode *root, LNode *node, int *isvisited)
+{
+    while (node != NULL)
+    {
+        if (!isvisited[((GNode *)node->data)->index - 1])
+        {
+            isvisited[((GNode *)node->data)->index - 1] = 1;
+            list_insert(((GNode *)root->data)->list_nodes, node->data);
+            _graph_get_component_rec_ver(graph, root, ((GNode *)node->data)->list_nodes->first, isvisited);
+        }
+        node = node->next;
+    }
+}
+
 int graph_cycle(Graph *graph, int start_index)
 {
     GNode *node;
@@ -275,7 +335,7 @@ int graph_cycle(Graph *graph, int start_index)
     if (node == NULL)
     {
         printf("Error: node not found\n");
-        return;
+        return result;
     }
 
     _grap_init_isvisit_array(isvisited, graph->size);
@@ -377,4 +437,75 @@ void _graph_print_stack_cycle(Stack *stack, int start_index)
     for (int i = j; i < stack->top; i++)
         printf("%d ", ((GNode *)stack->buf[i])->index);
     printf("\n");
+}
+
+void graph_connect_direct(Graph *graph, int index_1, int index_2, int *opres)
+{
+    GNode *node_1, *node_2;
+    node_1 = graph_find_ind(graph, index_1);
+    node_2 = graph_find_ind(graph, index_2);
+    if (node_1 == NULL || node_2 == NULL || index_1 == index_2)
+    {
+        printf("Error during connection\n");
+        *opres = 1;
+        return;
+    }
+    List *list1, *list2;
+    list1 = _graph_get_list_node(graph, node_1);
+    list2 = _graph_get_list_node(graph, node_2);
+    if (list_search(list2, node_1) != NULL)
+    {
+        printf("Nodes already connected\n");
+        *opres = 2;
+        return;
+    }
+    list_insert(list1, node_2);
+    *opres = 0;
+}
+
+int graph_direct_cycle(Graph *graph, int start_index)
+{
+    GNode *node;
+    Stack *stack;
+    int isvisited[graph->size];
+    int result = 0;
+
+    node = graph_find_ind(graph, start_index);
+    if (node == NULL)
+    {
+        printf("Error: node not found\n");
+        return result;
+    }
+
+    _grap_init_isvisit_array(isvisited, graph->size);
+    stack = stack_init(graph->size);
+    _graph_direct_cycle(graph, node, isvisited, node, stack, &result);
+    stack_free(&stack);
+}
+
+void _graph_direct_cycle(Graph *graph, GNode *node, int *isvisited, GNode *from, Stack *stack, int *res)
+{
+    if (isvisited[node->index - 1])
+        return;
+    LNode *lnode = (_graph_get_list_node(graph, node))->first;
+    isvisited[node->index - 1] = 1;
+    stack_push(stack, node);
+    while (lnode != NULL)
+    {
+        if (isvisited[((GNode *)lnode->data)->index - 1] && ((GNode *)lnode->data)->index != from->index)
+        {
+            if (_graph_stack_search(stack, ((GNode *)lnode->data)->index))
+            {
+                _graph_print_stack_cycle(stack, ((GNode *)lnode->data)->index);
+                isvisited[node->index - 1] = 0;
+                stack_pop(stack);
+                *res = 1;
+                return;
+            }
+        }
+        if (!isvisited[((GNode *)lnode->data)->index - 1])
+            _graph_direct_cycle(graph, lnode->data, isvisited, node, stack, res);
+        lnode = lnode->next;
+    }
+    stack_pop(stack);
 }

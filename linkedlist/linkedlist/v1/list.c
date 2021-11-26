@@ -90,6 +90,8 @@ LNode *list_search_prev(List *list, void *data)
 
 void list_print(List *list)
 {
+    if (list == NULL)
+        return;
     LNode *node = list->first;
     printf("Printing list\n");
     while (node != NULL)
@@ -112,5 +114,4 @@ void list_destr(List **list)
 
     free((*list));
     *list = NULL;
-
 }

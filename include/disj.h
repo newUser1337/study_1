@@ -23,5 +23,6 @@ DSNode *dsset_find_element_by_ind(DSSet *, int);
 DSNode *dsset_find_set(DSSet *, int);
 DSNode *dsset_join_set(DSSet *, int, int);
 void dsset_print_node(DSSet *, int);
+void dsset_destr(DSSet **);
 
 #endif

@@ -6,6 +6,10 @@
 void _dsset_print_tree_node_index(void *);
 int _dsset_print_tree_node_compare(void *, void *);
 DSNode *_dsset_create_node(int, void *);
+void _dsset_tree_destr(Tree **);
+void _dsset_tree_node_destr_rec(TNode *);
+void _dsset_tree_node_destr_rec(TNode *);
+void _dsset_free_node_destr(TNode **);
 
 DSSet *dsset_init(void (*printnode)(DSNode *))
 {
@@ -25,9 +29,8 @@ DSNode *dsset_create_set(DSSet *dsset, int index, void *data)
         return result;
     }
     result = _dsset_create_node(index, data);
-    tree_add(dsset->treeset, result);
 
-    return tree_add(dsset->treeset, result)->data;
+    return (tree_add(dsset->treeset, result))->data;
 }
 
 DSNode *_dsset_create_node(int index, void *data)
@@ -119,4 +122,37 @@ void dsset_print_node(DSSet *dsset, int index)
         printf("Element not found \n");
 
     dsset->printnode(node);
+}
+
+void dsset_destr(DSSet **dsset)
+{
+    _dsset_tree_destr(&(*dsset)->treeset);
+    free(*dsset);
+    *dsset = NULL;
+}
+
+void _dsset_tree_destr(Tree **tr)
+{
+    if ((*tr)->first != NULL)
+        _dsset_tree_node_destr_rec((*tr)->first);
+
+    free(*tr);
+    *tr = NULL;
+}
+
+void _dsset_tree_node_destr_rec(TNode *node)
+{
+    if (node->left != NULL)
+        _dsset_tree_node_destr_rec(node->left);
+    if (node->right != NULL)
+        _dsset_tree_node_destr_rec(node->right);
+
+    _dsset_free_node_destr(&node);
+}
+
+void _dsset_free_node_destr(TNode **node)
+{
+    free((*node)->data);
+    free(*node);
+    *node = NULL;
 }
