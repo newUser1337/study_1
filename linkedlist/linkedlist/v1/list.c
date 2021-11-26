@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include "list.h"
 
-Node *_list_create_node(void *);
-void _list_free_node(Node **);
+LNode *_list_create_node(void *);
+void _list_free_node(LNode **);
 
 List *list_init(int (*cmpdata)(void *, void *), void (*printdata)(void *))
 {
@@ -16,23 +16,23 @@ List *list_init(int (*cmpdata)(void *, void *), void (*printdata)(void *))
     return list;
 }
 
-Node *_list_create_node(void *data)
+LNode *_list_create_node(void *data)
 {
-    Node *node = (Node *)malloc(sizeof(Node));
+    LNode *node = (LNode *)malloc(sizeof(LNode));
     node->data = data;
     node->next = NULL;
     return node;
 }
 
-void _list_free_node(Node **node)
+void _list_free_node(LNode **node)
 {
     free((*node));
     *node = NULL;
 }
 
-Node *list_append(List *list, void *data)
+LNode *list_append(List *list, void *data)
 {
-    Node *node = _list_create_node(data);
+    LNode *node = _list_create_node(data);
     if (list->last == NULL)
 
         list->first = node;
@@ -43,22 +43,22 @@ Node *list_append(List *list, void *data)
     return node;
 }
 
-Node *list_search(List *list, void *data)
+LNode *list_search(List *list, void *data)
 {
-    Node *node = list->first;
+    LNode *node = list->first;
     while (node != NULL && list->cmpdata(node->data, data))
         node = node->next;
 
     return node;
 }
 
-Node *list_insert(List *list, void *data)
+LNode *list_insert(List *list, void *data)
 {
-    Node *node = list_search(list, data);
+    LNode *node = list_search(list, data);
     if (node == NULL)
     {
         node = _list_create_node(data);
-        Node *prev_node = list_search_prev(list, data);
+        LNode *prev_node = list_search_prev(list, data);
         if (prev_node != NULL)
         {
             node->next = prev_node->next;
@@ -76,9 +76,9 @@ Node *list_insert(List *list, void *data)
     return node;
 }
 
-Node *list_search_prev(List *list, void *data)
+LNode *list_search_prev(List *list, void *data)
 {
-    Node *node = list->first, *rnode = NULL;
+    LNode *node = list->first, *rnode = NULL;
     while (node != NULL && (list->cmpdata(data, node->data) != -1))
     {
         rnode = node;
@@ -90,7 +90,7 @@ Node *list_search_prev(List *list, void *data)
 
 void list_print(List *list)
 {
-    Node *node = list->first;
+    LNode *node = list->first;
     printf("Printing list\n");
     while (node != NULL)
     {
@@ -102,7 +102,7 @@ void list_print(List *list)
 
 void list_destr(List **list)
 {
-    Node *node = (*list)->first, *temp_node;
+    LNode *node = (*list)->first, *temp_node;
     while (node != NULL)
     {
         temp_node = node->next;
@@ -112,5 +112,10 @@ void list_destr(List **list)
 
     free((*list));
     *list = NULL;
+
+}
+
+void graph_destr(Graph **graph)
+{
 
 }

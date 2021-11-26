@@ -1,12 +1,12 @@
-all: stack.o main.o
-	gcc main.o stack.o -o main
+all: lib main.c
+	gcc main.c stack.o -o program.out
 
-main.o: stack.o main.c
-	gcc -c main.c stack.o -o main.o
+lib: stack.o
+	ar cr lib/libstack.a stack.o
 
 stack.o: stack.h stack.c
-	gcc -c stack.c -o stack.o
+	gcc -g -c stack.c -o stack.o
 
 clean:
 	rm -f *.o
-	rm -f main
+	rm -f program.out

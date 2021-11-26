@@ -1,3 +1,4 @@
+#include "list.h"
 #ifndef __KDTREE__
 #define __KDTREE__
 
@@ -27,5 +28,6 @@ void kdtree_print_postorder(KDTree *);
 void kdtree_print_inorder(KDTree *);
 
 KDNode *kdtree_find_nearest(KDTree *, void *);
+void kdtree_find_range(KDTree *, void *, void *, List *);
 
 #endif

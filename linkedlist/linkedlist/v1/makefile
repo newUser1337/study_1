@@ -1,4 +1,4 @@
-all: main.c list.o
+all: main.c lib
 	gcc -g main.c list.o -o program.out
 
 lib: list.o

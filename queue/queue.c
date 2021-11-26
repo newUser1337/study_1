@@ -50,6 +50,16 @@ void *queue_dequeue(Queue *q)
     return tmp;
 }
 
+void *queue_dequeue_peek(Queue *q)
+{
+    if (q->st == q->end && !q->length)
+        return NULL;
+
+    void *tmp;
+    tmp = q->buf[q->st];
+    return tmp;
+}
+
 void queue_print(Queue *q, void (*p_func)(void *data))
 {
     printf("Printing queue, bufsize = %zd, lenght = %zd, st = %zd, end = %zd \n",

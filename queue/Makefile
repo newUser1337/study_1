@@ -1,12 +1,12 @@
-all: queue.o main.o
-	gcc main.o queue.o -o main
+all: main.c lib
+	gcc -g main.c queue.o -o program.out
 
-main.o: queue.o main.c
-	gcc -c main.c -o main.o
+lib: queue.o 
+	ar cr lib/libqueue.a queue.o
 
 queue.o: queue.h queue.c
-	gcc -c queue.c -o queue.o
+	gcc -c -g queue.c -o queue.o
 
 clean:
 	rm -f *.o
-	rm -f main
+	rm -f program.out

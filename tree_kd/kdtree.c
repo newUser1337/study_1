@@ -9,6 +9,7 @@ void _kdtree_node_destr(KDNode **);
 KDNode *_kdtree_add_data(KDTree *, KDNode *, void *, int);
 KDNode *_kdtree_get_closest(KDTree *, KDNode *, KDNode *, void *);
 KDNode *_kdtree_find_nearest(KDTree *, KDNode *, void *, int);
+void _kdtree_find_range(KDTree *, KDNode *, int, void *, void *, List *);
 
 void _kdtree_print_inorder(KDNode *, KDTree *);
 void _kdtree_print_postorder(KDNode *, KDTree *);
@@ -197,4 +198,36 @@ KDNode *_kdtree_get_closest(KDTree *kdtree, KDNode *n1, KDNode *n2, void *data)
         return n1;
     else
         return n2;
+}
+
+void kdtree_find_range(KDTree *kdtree, void *data_min, void *data_max, List *result)
+{
+    _kdtree_find_range(kdtree, kdtree->root, 0, data_min, data_max, result);
+}
+
+void _kdtree_find_range(KDTree *kdtree, KDNode *root, int depth, void *data_min, void *data_max, List *result)
+{
+    if (root == NULL)
+        return;
+
+    printf("depth %d\n", depth);
+    
+    if (kdtree->comparedata(root->data, data_min, depth % kdtree->K) < 0)
+    {
+        printf("right ");
+        _kdtree_find_range(kdtree, root->right, depth + 1, data_min, data_max, result);
+    }
+    else
+    {
+        if (kdtree->comparedata(root->data, data_max, depth % kdtree->K) <= 0)
+        {
+            printf("right ");
+            _kdtree_find_range(kdtree, root->right, depth + 1, data_min, data_max, result);
+            if ((kdtree->comparedata(root->data, data_max, (depth + 1) % kdtree->K) <= 0) &&
+                (kdtree->comparedata(root->data, data_min, (depth + 1) % kdtree->K) >= 0))
+                list_append(result, root->data);
+        }
+        printf("left ");
+        _kdtree_find_range(kdtree, root->left, depth + 1, data_min, data_max, result);
+    }
 }
