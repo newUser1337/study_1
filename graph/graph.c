@@ -16,10 +16,13 @@ void _graph_print_node_index(Graph *, GNode *);
 void _graph_dfs(Graph *, GNode *, Stack *, int *);
 void _graph_dfs_rec(Graph *, GNode *, int *);
 void _graph_bfs(Graph *, GNode *, Queue *, int *);
+void _graph_cycle(Graph *, GNode *, int *, GNode *, Stack *, int *);
 void _graph_tree_destr(Tree **);
 void _graph_tree_node_destr_rec(TNode *);
 void _graph_tree_node_destr(TNode **);
-void _grap_init_isvisit_array(int *, int );
+void _grap_init_isvisit_array(int *, int);
+void _graph_print_stack_cycle(Stack *, int);
+int _graph_stack_search(Stack *, int);
 
 Graph *graph_init(void (*printdata)(void *),
                   int (*cmpdata)(void *, void *))
@@ -112,7 +115,6 @@ GNode *graph_find_ind(Graph *graph, int index)
         return tree_node->data;
     else
         return NULL;
-
 }
 
 void graph_print(Graph *graph)
@@ -133,7 +135,6 @@ void _graph_print_node(Graph *graph, GNode *node)
 void _graph_print_node_index(Graph *graph, GNode *node)
 {
     graph->printdata(node);
-    printf("\n");
 }
 
 void _graph_print_node_rec(Graph *graph, TNode *root)
@@ -162,6 +163,7 @@ void graph_dfs(Graph *graph, int start_index)
     st = stack_init(graph->size);
     _graph_dfs(graph, node, st, isvisited);
     stack_free(&st);
+    printf("\n");
 }
 
 void _graph_dfs(Graph *graph, GNode *node, Stack *st, int *isvisited)
@@ -201,6 +203,7 @@ void graph_dfs_rec(Graph *graph, int start_index)
     }
     _grap_init_isvisit_array(isvisited, graph->size);
     _graph_dfs_rec(graph, node, isvisited);
+    printf("\n");
 }
 
 void _graph_dfs_rec(Graph *graph, GNode *node, int *isvisited)
@@ -236,6 +239,7 @@ void graph_bfs(Graph *graph, int start_index)
     queue = queue_init(graph->size);
     _graph_bfs(graph, node, queue, isvisited);
     queue_free(&queue);
+    printf("\n");
 }
 
 void _graph_bfs(Graph *graph, GNode *node, Queue *queue, int *isvisited)
@@ -258,6 +262,53 @@ void _graph_bfs(Graph *graph, GNode *node, Queue *queue, int *isvisited)
             lnode = lnode->next;
         }
     }
+}
+
+int graph_cycle(Graph *graph, int start_index)
+{
+    GNode *node;
+    Stack *stack;
+    int isvisited[graph->size];
+    int result = 0;
+
+    node = graph_find_ind(graph, start_index);
+    if (node == NULL)
+    {
+        printf("Error: node not found\n");
+        return;
+    }
+
+    _grap_init_isvisit_array(isvisited, graph->size);
+    stack = stack_init(graph->size);
+    _graph_cycle(graph, node, isvisited, node, stack, &result);
+    stack_free(&stack);
+}
+
+void _graph_cycle(Graph *graph, GNode *node, int *isvisited, GNode *from, Stack *stack, int *res)
+{
+    if (isvisited[node->index - 1])
+        return;
+    LNode *lnode = (_graph_get_list_node(graph, node))->first;
+    isvisited[node->index - 1] = 1;
+    stack_push(stack, node);
+    while (lnode != NULL)
+    {
+        if (isvisited[((GNode *)lnode->data)->index - 1] && ((GNode *)lnode->data)->index != from->index)
+        {
+            if (_graph_stack_search(stack, ((GNode *)lnode->data)->index))
+            {
+                _graph_print_stack_cycle(stack, ((GNode *)lnode->data)->index);
+                isvisited[node->index - 1] = 0;
+                stack_pop(stack);
+                *res = 1;
+                return;
+            }
+        }
+        if (!isvisited[((GNode *)lnode->data)->index - 1])
+            _graph_cycle(graph, lnode->data, isvisited, node, stack, res);
+        lnode = lnode->next;
+    }
+    stack_pop(stack);
 }
 
 void graph_destr(Graph **graph)
@@ -300,4 +351,30 @@ void _grap_init_isvisit_array(int *array, int size)
 {
     for (int i = 0; i < size; i++)
         array[i] = 0;
+}
+
+int _graph_stack_search(Stack *stack, int index)
+{
+    int res = 0;
+    for (int i = 0; i < stack->top; i++)
+    {
+        if (((GNode *)stack->buf[i])->index == index)
+        {
+            res = 1;
+            break;
+        }
+    }
+    return res;
+}
+
+void _graph_print_stack_cycle(Stack *stack, int start_index)
+{
+    int j;
+    for (j = 0; j < stack->top; j++)
+        if (((GNode *)stack->buf[j])->index == start_index)
+            break;
+
+    for (int i = j; i < stack->top; i++)
+        printf("%d ", ((GNode *)stack->buf[i])->index);
+    printf("\n");
 }

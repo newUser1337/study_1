@@ -28,6 +28,7 @@ void graph_print(Graph *);
 void graph_dfs(Graph*,int);
 void graph_dfs_rec(Graph*,int);
 void graph_bfs(Graph*,int);
+int graph_cycle(Graph*,int);
 void graph_destr(Graph **);
 
 #endif

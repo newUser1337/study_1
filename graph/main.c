@@ -36,6 +36,8 @@ int main()
     graph_dfs_rec(graph, 2);
     printf("bfs\n");
     graph_bfs(graph, 2);
+    printf("cycle: \n");
+    graph_cycle(graph, 8);
 
     graph_destr(&graph);
 
