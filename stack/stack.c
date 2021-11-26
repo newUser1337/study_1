@@ -1,39 +1,41 @@
 #include "stack.h"
 #include <stdlib.h>
 
-Stack stack_init(size_t size)
+Stack *stack_init(size_t size)
 {
-    Stack s;
-    s.top = 0;
-    s.bufsize = size;
-    s.buf = (void **)malloc(sizeof(void *) * size);
+    Stack *stack = (Stack *)malloc(sizeof(Stack));
+    stack->top = 0;
+    stack->bufsize = size;
+    stack->buf = (void **)malloc(sizeof(void *) * size);
 
-    return s;
+    return stack;
 }
 
-void stack_free(Stack *s)
+void stack_free(Stack **stack)
 {
-    free(s->buf);
-    s->buf = NULL;
+    free((*stack)->buf);
+    (*stack)->buf = NULL;
+    free(*stack);
+    *stack = NULL;
 }
 
-void* stack_peek(Stack * s)
+void* stack_peek(Stack * stack)
 {
-    if(s->top == 0)
+    if(stack->top == 0)
         return NULL;
-    return s->buf[s->top-1];
+    return stack->buf[stack->top-1];
 }
 
-void* stack_pop(Stack *s)
+void* stack_pop(Stack *stack)
 {
-    if(s->top == 0)
+    if(stack->top == 0)
         return NULL;
-    return s->buf[--s->top];
+    return stack->buf[--stack->top];
 }
 
-void stack_push(Stack *s, void* data)
+void stack_push(Stack *stack, void* data)
 {
-    if(s->top == s->bufsize)
+    if(stack->top == stack->bufsize)
         exit(1);
-    s->buf[s->top++]= data;
+    stack->buf[stack->top++]= data;
 }

@@ -10,8 +10,8 @@ typedef struct Stack{
     void **buf;
 } Stack;
 
-Stack stack_init(size_t);
-void stack_free(Stack *);
+Stack *stack_init(size_t);
+void stack_free(Stack **);
 
 void* stack_peek(Stack *);
 void* stack_pop(Stack *);

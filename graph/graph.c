@@ -148,7 +148,7 @@ void _graph_print_node_rec(Graph *graph, TNode *root)
 void graph_dfs(Graph *graph, int start_index)
 {
     GNode *node;
-    Stack st;
+    Stack *st;
     int isvisited[graph->size];
 
     node = graph_find_ind(graph, start_index);
@@ -160,7 +160,7 @@ void graph_dfs(Graph *graph, int start_index)
 
     _grap_init_isvisit_array(isvisited, graph->size);
     st = stack_init(graph->size);
-    _graph_dfs(graph, node, &st, isvisited);
+    _graph_dfs(graph, node, st, isvisited);
     stack_free(&st);
 }
 
@@ -222,7 +222,7 @@ void _graph_dfs_rec(Graph *graph, GNode *node, int *isvisited)
 void graph_bfs(Graph *graph, int start_index)
 {
     GNode *node;
-    Queue queue;
+    Queue *queue;
     int isvisited[graph->size];
 
     node = graph_find_ind(graph, start_index);
@@ -234,7 +234,7 @@ void graph_bfs(Graph *graph, int start_index)
 
     _grap_init_isvisit_array(isvisited, graph->size);
     queue = queue_init(graph->size);
-    _graph_bfs(graph, node, &queue, isvisited);
+    _graph_bfs(graph, node, queue, isvisited);
     queue_free(&queue);
 }
 

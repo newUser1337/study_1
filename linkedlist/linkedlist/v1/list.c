@@ -114,8 +114,3 @@ void list_destr(List **list)
     *list = NULL;
 
 }
-
-void graph_destr(Graph **graph)
-{
-
-}

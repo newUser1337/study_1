@@ -3,26 +3,24 @@
 #include <errno.h>
 #include "queue.h"
 
-Queue queue_init(size_t bufsize)
+Queue *queue_init(size_t bufsize)
 {
-    Queue q;
-    q.bufsize = bufsize;
-    q.st = 0;
-    q.end = 0;
-    q.length = 0;
-    q.buf = (void **)malloc(sizeof(void *) * bufsize);
+    Queue *queue = (Queue*)malloc(sizeof(Queue));
+    queue->bufsize = bufsize;
+    queue->st = 0;
+    queue->end = 0;
+    queue->length = 0;
+    queue->buf = (void **)malloc(sizeof(void *) * bufsize);
 
-    return q;
+    return queue;
 }
 
-void queue_free(Queue *q)
+void queue_free(Queue **q)
 {
-    free(q->buf);
-    q->buf = NULL;
-    q->st = 0;
-    q->end = 0;
-    q->length = 0;
-    q->bufsize = 0;
+    free((*q)->buf);
+    (*q)->buf = NULL;
+    free(*q);
+    *q = NULL;
 }
 
 void queue_queue(Queue *q, void *data)
