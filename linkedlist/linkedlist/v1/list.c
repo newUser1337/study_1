@@ -115,3 +115,36 @@ void list_destr(List **list)
     free((*list));
     *list = NULL;
 }
+
+void list_remove(List* list, LNode **lnode)
+{
+    LNode *lnode_prev;
+
+    if (list->first == *lnode)
+    {
+        list->first = (*lnode)->next;
+        if (list->last == *lnode)
+        {
+            list->last = (*lnode)->next;
+        }
+    }
+    else
+    {
+        lnode_prev = list->first;
+        while (lnode_prev != NULL && lnode_prev->next != *lnode)
+            lnode_prev = lnode_prev->next;
+        if(lnode_prev == NULL)
+            return;
+        if ((*lnode)->next == NULL)
+        {
+            list->last = lnode_prev;
+            lnode_prev->next = NULL;
+
+        }
+        else
+        {
+            lnode_prev->next = (*lnode)->next;
+        }
+    }
+    _list_free_node(lnode);
+}

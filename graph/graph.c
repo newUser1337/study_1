@@ -6,7 +6,13 @@
 #include "queue.h"
 #include "stack.h"
 
-GNode *_graph_create_node(int, void *);
+typedef struct Path
+{
+    int from;
+    int to;
+} Path;
+
+GNode *_graph_create_node(Graph *, int, void *);
 void _graph_add(Graph *, GNode *);
 Tree *_graph_get_tree(Graph *);
 List *_graph_get_list_node(Graph *, GNode *);
@@ -20,11 +26,17 @@ void _graph_cycle(Graph *, GNode *, int *, GNode *, Stack *, int *);
 void _graph_tree_destr(Tree **);
 void _graph_tree_node_destr_rec(TNode *);
 void _graph_tree_node_destr(TNode **);
-void _grap_init_isvisit_array(int *, int);
+void _graph_init_isvisit_array(int *, int);
 void _graph_print_stack_cycle(Stack *, int);
 int _graph_stack_search(Stack *, int);
 void _graph_get_component_rec(Graph *, TNode *, int *, List *);
 void _graph_get_component_rec_ver(Graph *, LNode *, LNode *, int *);
+int cmp_index(void *, void *);
+int print_index(void *);
+void _graph_direct_cycle(Graph *, LNode **, List *, List *, List *, List *, int *);
+void _graph_fill_list_rec(Graph *, List *, TNode *);
+void _graph_fill_list(Graph *, List *);
+void print_path(void *);
 
 Graph *graph_init(void (*printdata)(void *),
                   int (*cmpdata)(void *, void *))
@@ -40,19 +52,19 @@ Graph *graph_init(void (*printdata)(void *),
 
 GNode *graph_add(Graph *graph, int index, void *data)
 {
-    GNode *node = _graph_create_node(index, data);
+    GNode *node = _graph_create_node(graph, index, data);
     graph->size++;
     _graph_add(graph, node);
 
     return node;
 }
 
-GNode *_graph_create_node(int index, void *data)
+GNode *_graph_create_node(Graph *graph, int index, void *data)
 {
     GNode *node = (GNode *)malloc(sizeof(GNode));
     node->data = data;
     node->index = index;
-    node->list_nodes = NULL;
+    node->list_nodes = list_init(graph->cmpdata, graph->printdata);
 
     return node;
 }
@@ -161,7 +173,7 @@ void graph_dfs(Graph *graph, int start_index)
         return;
     }
 
-    _grap_init_isvisit_array(isvisited, graph->size);
+    _graph_init_isvisit_array(isvisited, graph->size);
     st = stack_init(graph->size);
     _graph_dfs(graph, node, st, isvisited);
     stack_free(&st);
@@ -203,7 +215,7 @@ void graph_dfs_rec(Graph *graph, int start_index)
         printf("Error: node not found\n");
         return;
     }
-    _grap_init_isvisit_array(isvisited, graph->size);
+    _graph_init_isvisit_array(isvisited, graph->size);
     _graph_dfs_rec(graph, node, isvisited);
     printf("\n");
 }
@@ -237,7 +249,7 @@ void graph_bfs(Graph *graph, int start_index)
         return;
     }
 
-    _grap_init_isvisit_array(isvisited, graph->size);
+    _graph_init_isvisit_array(isvisited, graph->size);
     queue = queue_init(graph->size);
     _graph_bfs(graph, node, queue, isvisited);
     queue_free(&queue);
@@ -269,7 +281,7 @@ void _graph_bfs(Graph *graph, GNode *node, Queue *queue, int *isvisited)
 void graph_get_component(Graph *graph, List *result)
 {
     int isvisited[graph->size];
-    _grap_init_isvisit_array(isvisited, graph->size);
+    _graph_init_isvisit_array(isvisited, graph->size);
 
     _graph_get_component_rec(graph, graph->tree->first, isvisited, result);
 }
@@ -283,10 +295,10 @@ void _graph_get_component_rec(Graph *graph, TNode *root, int *isvisited, List *r
         isvisited[((GNode *)root->data)->index - 1] = 1;
 
         List *list_nodes = ((GNode *)root->data)->list_nodes;
-        GNode *source = _graph_create_node(((GNode*)root->data)->index, ((GNode*)root->data)->data);
-        _graph_get_list_node(graph,source);
+        GNode *source = _graph_create_node(graph, ((GNode *)root->data)->index, ((GNode *)root->data)->data);
+        _graph_get_list_node(graph, source);
         LNode *cur_node = list_append(result, source);
-        list_insert(((GNode*)cur_node->data)->list_nodes, source);
+        list_insert(((GNode *)cur_node->data)->list_nodes, source);
         LNode *node;
         if (list_nodes != NULL)
         {
@@ -307,8 +319,6 @@ void _graph_get_component_rec(Graph *graph, TNode *root, int *isvisited, List *r
     _graph_get_component_rec(graph, root->left, isvisited, result);
     _graph_get_component_rec(graph, root->right, isvisited, result);
 }
-
-
 
 void _graph_get_component_rec_ver(Graph *graph, LNode *root, LNode *node, int *isvisited)
 {
@@ -338,7 +348,7 @@ int graph_cycle(Graph *graph, int start_index)
         return result;
     }
 
-    _grap_init_isvisit_array(isvisited, graph->size);
+    _graph_init_isvisit_array(isvisited, graph->size);
     stack = stack_init(graph->size);
     _graph_cycle(graph, node, isvisited, node, stack, &result);
     stack_free(&stack);
@@ -407,7 +417,7 @@ void _graph_tree_node_destr(TNode **node)
     *node = NULL;
 }
 
-void _grap_init_isvisit_array(int *array, int size)
+void _graph_init_isvisit_array(int *array, int size)
 {
     for (int i = 0; i < size; i++)
         array[i] = 0;
@@ -463,49 +473,94 @@ void graph_connect_direct(Graph *graph, int index_1, int index_2, int *opres)
     *opres = 0;
 }
 
-int graph_direct_cycle(Graph *graph, int start_index)
+int graph_direct_cycle(Graph *graph)
 {
-    GNode *node;
-    Stack *stack;
-    int isvisited[graph->size];
     int result = 0;
 
-    node = graph_find_ind(graph, start_index);
-    if (node == NULL)
-    {
-        printf("Error: node not found\n");
-        return result;
-    }
+    List *l_nprocess = list_init(graph->cmpdata, graph->printdata);
+    List *l_inprocess = list_init(graph->cmpdata, graph->printdata);
+    List *l_processed = list_init(graph->cmpdata, graph->printdata);
+    List *path = list_init(cmp_index, print_path);
+    _graph_fill_list(graph, l_nprocess);
 
-    _grap_init_isvisit_array(isvisited, graph->size);
-    stack = stack_init(graph->size);
-    _graph_direct_cycle(graph, node, isvisited, node, stack, &result);
-    stack_free(&stack);
+    while (l_nprocess->first != NULL)
+    {
+        LNode *temp = l_nprocess->first;
+        _graph_direct_cycle(graph, &temp, l_nprocess, l_inprocess, l_processed, path, &result);
+    }
+    return result;
 }
 
-void _graph_direct_cycle(Graph *graph, GNode *node, int *isvisited, GNode *from, Stack *stack, int *res)
+void _graph_direct_cycle(Graph *graph, LNode **root, List *l_nprocess, List *l_inprocess, List *l_processed, List *path, int *res)
 {
-    if (isvisited[node->index - 1])
+    if (*root == NULL)
         return;
-    LNode *lnode = (_graph_get_list_node(graph, node))->first;
-    isvisited[node->index - 1] = 1;
-    stack_push(stack, node);
+    if (list_search(l_processed, *root) != NULL)
+        return;
+    if (list_search(l_inprocess, *root) != NULL)
+    {
+        *res = 1;
+        return;
+    }
+
+    LNode *ltemp = list_insert(l_inprocess, (*root)->data);
+    list_remove(l_nprocess, root);
+    List *list_child = ((GNode *)ltemp->data)->list_nodes;
+    LNode *lnode;
+    lnode = list_child->first;
     while (lnode != NULL)
     {
-        if (isvisited[((GNode *)lnode->data)->index - 1] && ((GNode *)lnode->data)->index != from->index)
-        {
-            if (_graph_stack_search(stack, ((GNode *)lnode->data)->index))
-            {
-                _graph_print_stack_cycle(stack, ((GNode *)lnode->data)->index);
-                isvisited[node->index - 1] = 0;
-                stack_pop(stack);
-                *res = 1;
-                return;
-            }
-        }
-        if (!isvisited[((GNode *)lnode->data)->index - 1])
-            _graph_direct_cycle(graph, lnode->data, isvisited, node, stack, res);
-        lnode = lnode->next;
+        Path *path_data = (Path *)malloc(sizeof(Path));
+        path_data->from = ((GNode *)ltemp->data)->index;
+        path_data->to = ((GNode *)lnode->data)->index;
+        list_insert(path, path_data);
+
+        _graph_direct_cycle(graph, &lnode, l_nprocess, l_inprocess, l_processed, path, res);
+
+        if (lnode == NULL)
+            lnode = list_child->first;
+        else
+            lnode = lnode->next;
     }
-    stack_pop(stack);
+    list_insert(l_processed, ltemp);
+    list_remove(l_inprocess, &ltemp);
+}
+
+void _graph_fill_list(Graph *graph, List *l_nprocess)
+{
+    _graph_fill_list_rec(graph, l_nprocess, graph->tree->first);
+}
+void _graph_fill_list_rec(Graph *graph, List *l_nprocess, TNode *root)
+{
+    if (root == NULL)
+        return;
+
+    list_append(l_nprocess, root->data);
+
+    _graph_fill_list_rec(graph, l_nprocess, root->left);
+    _graph_fill_list_rec(graph, l_nprocess, root->right);
+}
+
+int print_index(void *data)
+{
+    printf("%d ", *((int *)data));
+}
+
+void print_path(void *data)
+{
+    Path *z = data;
+    printf("(%d->%d) \n", z->from, z->to);
+}
+
+int cmp_index(void *data_1, void *data_2)
+{
+    int *a1, *a2;
+    a1 = data_1;
+    a2 = data_2;
+    if (*a1 > *a2)
+        return 1;
+    else if (*a1 < *a2)
+        return -1;
+    else
+        return 0;
 }

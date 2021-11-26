@@ -22,5 +22,6 @@ LNode *list_insert(List *, void *);
 LNode *list_search_prev(List *, void *);
 void list_print(List *);
 void list_destr(List **);
+void list_remove(List* , LNode **);
 
 #endif

@@ -31,6 +31,10 @@ int main()
     graph_connect_direct(graph, 4, 5, &opres);
     graph_print(graph);
 
+    int res;
+    res = graph_direct_cycle(graph);
+    if(res)
+        printf("true\n");
 
     return 0;
 }
