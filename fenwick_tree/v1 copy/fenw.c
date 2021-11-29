@@ -13,7 +13,7 @@ fenw *fenw_init(int *array, size_t size)
     fw->size = size;
 
     for (int i = 0; i < fw->size; i++)
-        fenw_update(fw, i+1, array[i]);
+        fenw_update(fw, i, array[i]);
 
     return fw;
 }
@@ -33,7 +33,7 @@ void fenw_update(fenw *fw, int ind, int value)
     while (ind < fw->size)
     {
         fw->array[ind] += value;
-        ind = get_next(ind);
+        ind = get_next(ind + 1) - 1;
     };
 }
 
@@ -48,11 +48,15 @@ void fenw_print(fenw *fw)
 int _fenw_get_sum(fenw *fw, int ind)
 {
     int out = 0;
-    while (ind > 0)
+    if (ind >= 0)
     {
+        while (ind > 0)
+        {
+            out += fw->array[ind];
+            ind = get_parent(ind + 1) - 1;
+        };
         out += fw->array[ind];
-        ind = get_parent(ind);
-    };
+    }
     return out;
 }
 

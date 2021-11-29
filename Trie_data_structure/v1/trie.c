@@ -62,7 +62,7 @@ Trie_node *_get_tr_node_by_key(List *list, char symbol, Trie_node *parent_tr_nod
     node_list n_list;
     n_list.symbol = symbol;
 
-    Node *lnode = list_search(list, &n_list);
+    LNode *lnode = list_search(list, &n_list);
     if (lnode == NULL)
     {
         node_list *new_n_list = _trie_create_n_list(symbol);
@@ -98,9 +98,10 @@ void _trie_print_words(Trie_node *tr_node)
     {
         _print_word(tr_node);
         printf("\n");
-        return;
     }
-    Node *lnode = tr_node->keys->first;
+    if(tr_node->keys == NULL)
+        return;
+    LNode *lnode = tr_node->keys->first;
     while (lnode != NULL)
     {
         _trie_print_words(((node_list *)lnode->data)->tr_next);
@@ -113,7 +114,7 @@ void _print_word(Trie_node *tr_node)
     if (tr_node->parent != NULL)
     {
         _print_word(tr_node->parent);
-        Node *lnode = tr_node->parent->keys->first;
+        LNode *lnode = tr_node->parent->keys->first;
         while (((node_list *)lnode->data)->tr_next != tr_node)
             lnode = lnode->next;
         printf("%c", ((node_list *)lnode->data)->symbol);
@@ -133,7 +134,7 @@ void _trie_search(Trie_node *tr_node, char *str, size_t cur_pos, size_t len, siz
         return;
 
     size_t next_pos;
-    Node *l_node = tr_node->keys->first;
+    LNode *l_node = tr_node->keys->first;
     while (l_node != NULL)
     {
         if (str[cur_pos] == ((node_list *)l_node->data)->symbol)
@@ -164,7 +165,7 @@ void _trie_get_words(Trie_node *tr_node, size_t dep, List *result)
         return;
     }
 
-    Node *l_node = tr_node->keys->first;
+    LNode *l_node = tr_node->keys->first;
     while (l_node != NULL)
     {
         _trie_get_words(((node_list *)l_node->data)->tr_next, dep + 1, result);
@@ -178,7 +179,7 @@ int _trie_get_word(Trie_node *tr_node, List *result, char *word)
     if (tr_node->parent != NULL)
     {
         pos = _trie_get_word(tr_node->parent, result, word);
-        Node *l_node = tr_node->parent->keys->first;
+        LNode *l_node = tr_node->parent->keys->first;
         while (((node_list *)l_node->data)->tr_next != tr_node)
             l_node = l_node->next;
 
@@ -198,7 +199,7 @@ void _trie_destr_node(Trie_node *tr_next)
 {
     if (!tr_next->isFinish)
     {
-        Node *l_node = tr_next->keys->first;
+        LNode *l_node = tr_next->keys->first;
         while (l_node != NULL)
         {
             _trie_destr_node(((node_list *)l_node->data)->tr_next);

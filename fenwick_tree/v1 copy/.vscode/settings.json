@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "fenw.h": "c",
+        "stdlib.h": "c"
+    }
+}

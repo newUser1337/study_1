@@ -17,9 +17,9 @@ int main()
     fenw *fw = fenw_init(array, SIZE);
     print_arr(array, SIZE);
     fenw_print(fw);
-    int sum = fenw_get_sum_lr(fw, 1, 9);
+    int sum = fenw_get_sum_lr(fw, 0, 8);
     printf("sum : %d\n", sum);
-    int elem = fenw_get_sum_element(fw, 1);
+    int elem = fenw_get_sum_element(fw, 8);
     printf("elem : %d\n", elem);
 
     return 0;

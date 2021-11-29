@@ -13,6 +13,7 @@ int main()
     trie_add_word(tr, "ward");
     trie_add_word(tr, "warhammer");
     trie_add_word(tr, "warmap");
+    trie_add_word(tr, "warma");
     trie_add_word(tr, "z_prog");
     trie_print(tr);
 
