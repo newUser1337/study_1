@@ -32,10 +32,16 @@ int main()
     graph_print(graph);
 
     int res;
-    res = graph_direct_cycle(graph);
-    if(res)
+    List **path;
+    path = (List **)malloc(sizeof(List *));
+    res = graph_direct_cycle(graph, path);
+    if (res)
         printf("true\n");
+    else
+        printf("false\n");
+    list_print(*path);
 
+    list_destr(path);
     return 0;
 }
 

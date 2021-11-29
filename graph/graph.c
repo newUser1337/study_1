@@ -33,7 +33,7 @@ void _graph_get_component_rec(Graph *, TNode *, int *, List *);
 void _graph_get_component_rec_ver(Graph *, LNode *, LNode *, int *);
 int cmp_index(void *, void *);
 int print_index(void *);
-void _graph_direct_cycle(Graph *, LNode **, List *, List *, List *, List *, int *);
+void _graph_direct_cycle(Graph *, LNode *, List *, List *, List *, List *, int *);
 void _graph_fill_list_rec(Graph *, List *, TNode *);
 void _graph_fill_list(Graph *, List *);
 void print_path(void *);
@@ -473,56 +473,53 @@ void graph_connect_direct(Graph *graph, int index_1, int index_2, int *opres)
     *opres = 0;
 }
 
-int graph_direct_cycle(Graph *graph)
+int graph_direct_cycle(Graph *graph, List **out_path)
 {
     int result = 0;
-
     List *l_nprocess = list_init(graph->cmpdata, graph->printdata);
     List *l_inprocess = list_init(graph->cmpdata, graph->printdata);
     List *l_processed = list_init(graph->cmpdata, graph->printdata);
-    List *path = list_init(cmp_index, print_path);
+    *out_path = list_init(cmp_index, print_path);
     _graph_fill_list(graph, l_nprocess);
-
     while (l_nprocess->first != NULL)
-    {
-        LNode *temp = l_nprocess->first;
-        _graph_direct_cycle(graph, &temp, l_nprocess, l_inprocess, l_processed, path, &result);
-    }
+        _graph_direct_cycle(graph, l_nprocess->first, l_nprocess, l_inprocess, l_processed, *out_path, &result);
+    
+    list_destr(&l_nprocess);
+    list_destr(&l_inprocess);
+    list_destr(&l_processed);
+    
     return result;
 }
 
-void _graph_direct_cycle(Graph *graph, LNode **root, List *l_nprocess, List *l_inprocess, List *l_processed, List *path, int *res)
+void _graph_direct_cycle(Graph *graph, LNode *root, List *l_nprocess, List *l_inprocess, List *l_processed, List *path, int *res)
 {
-    if (*root == NULL)
+    if (root == NULL)
         return;
-    if (list_search(l_processed, *root) != NULL)
+    if (list_search(l_processed, root->data) != NULL)
         return;
-    if (list_search(l_inprocess, *root) != NULL)
+    if (list_search(l_inprocess, root->data) != NULL)
     {
         *res = 1;
         return;
     }
 
-    LNode *ltemp = list_insert(l_inprocess, (*root)->data);
-    list_remove(l_nprocess, root);
+    LNode *ltemp = list_insert(l_inprocess, root->data);
+    LNode *l_del = list_search(l_nprocess, root->data);
+    list_remove(l_nprocess, &l_del);
     List *list_child = ((GNode *)ltemp->data)->list_nodes;
-    LNode *lnode;
-    lnode = list_child->first;
+    LNode *lnode = list_child->first;
     while (lnode != NULL)
     {
         Path *path_data = (Path *)malloc(sizeof(Path));
         path_data->from = ((GNode *)ltemp->data)->index;
         path_data->to = ((GNode *)lnode->data)->index;
-        list_insert(path, path_data);
+        list_append(path, path_data);
 
-        _graph_direct_cycle(graph, &lnode, l_nprocess, l_inprocess, l_processed, path, res);
+        _graph_direct_cycle(graph, lnode, l_nprocess, l_inprocess, l_processed, path, res);
 
-        if (lnode == NULL)
-            lnode = list_child->first;
-        else
-            lnode = lnode->next;
+        lnode = (lnode == NULL) ? list_child->first : lnode->next;
     }
-    list_insert(l_processed, ltemp);
+    list_insert(l_processed, ltemp->data);
     list_remove(l_inprocess, &ltemp);
 }
 

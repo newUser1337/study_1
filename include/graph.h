@@ -32,6 +32,6 @@ void graph_bfs(Graph *, int);
 int graph_cycle(Graph *, int);
 void graph_destr(Graph **);
 void graph_get_component(Graph *, List *);
-int graph_direct_cycle(Graph *);
+int graph_direct_cycle(Graph *, List**);
 
 #endif
